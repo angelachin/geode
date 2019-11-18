@@ -19,7 +19,7 @@ public class SocketCreatorWithProxyTest {
   @Test
   public void connectWithProxy() throws IOException {
     final Proxy proxy =
-        new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 1080));
+        new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 10800));
 
     Socket socket = new Socket(proxy);
     socket.connect(InetSocketAddress.createUnresolved("cluster-sample-locator", 10334));

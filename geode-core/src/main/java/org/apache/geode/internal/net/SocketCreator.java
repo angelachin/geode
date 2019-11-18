@@ -882,7 +882,7 @@ public class SocketCreator {
       boolean sslConnection) throws IOException {
     Socket socket = null;
     final Proxy proxy =
-        new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 1080));
+        new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 10800));
     printConfig();
     try {
       if (sslConnection) {

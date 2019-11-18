@@ -176,7 +176,7 @@ public class TcpClient {
     logger.debug("TcpClient sending {} to {}", request, ipAddr);
 
     Socket sock =
-        socketCreator.connect(ipAddr.getAddress(), ipAddr.getPort(), (int) newTimeout, null, false);
+        socketCreator.connect(ipAddr, (int) newTimeout, null, false);
     sock.setSoTimeout((int) newTimeout);
     DataOutputStream out = null;
     try {
@@ -258,7 +258,7 @@ public class TcpClient {
     gossipVersion = TcpServer.getOldGossipVersion();
 
     try {
-      sock = socketCreator.connect(ipAddr.getAddress(), ipAddr.getPort(), timeout, null, false);
+      sock = socketCreator.connect(ipAddr, timeout, null, false);
       sock.setSoTimeout(timeout);
     } catch (SSLException e) {
       throw new IllegalStateException("Unable to form SSL connection", e);

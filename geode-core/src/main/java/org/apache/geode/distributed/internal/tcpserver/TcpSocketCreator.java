@@ -17,6 +17,7 @@ package org.apache.geode.distributed.internal.tcpserver;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -32,8 +33,13 @@ public interface TcpSocketCreator {
   ServerSocket createServerSocket(int nport, int backlog, InetAddress bindAddr)
       throws IOException;
 
+  @Deprecated
   Socket connect(InetAddress inetadd, int port, int timeout,
       ConnectionWatcher optionalWatcher, boolean clientSide) throws IOException;
 
+  Socket connect(InetSocketAddress ipAddr, int timeout, ConnectionWatcher optionalWatcher,
+      boolean clientSide) throws IOException;
+
   void handshakeIfSocketIsSSL(Socket socket, int timeout) throws IOException;
+
 }

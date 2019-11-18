@@ -245,7 +245,9 @@ public class InternalDistributedMember
   public InternalDistributedMember(ServerLocation location) {
     final InetAddress addr;
     try {
-      addr = hostnameResolver.getInetAddress(location);
+      // addr = hostnameResolver.getInetAddress(location);
+      // TODO proxy - how do we resolve this over proxy?
+      addr = InetAddress.getLocalHost();
     } catch (UnknownHostException e) {
       throw new ServerConnectivityException("Unable to resolve server location " + location, e);
     }

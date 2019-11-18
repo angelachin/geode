@@ -286,8 +286,9 @@ public class Version implements Comparable<Version> {
    * This constant must be set to the most current version of the product. !!! NOTE: update
    * HIGHEST_VERSION when changing CURRENT !!!
    */
+  // TODO proxy - Just a hack to work around version on images.
   @Immutable
-  public static final Version CURRENT = GEODE_1_12_0;
+  public static final Version CURRENT = GEODE_1_10_0;
 
   /**
    * A lot of versioning code needs access to the current version's ordinal

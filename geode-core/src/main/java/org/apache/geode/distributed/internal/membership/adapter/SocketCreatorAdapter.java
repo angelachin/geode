@@ -17,6 +17,7 @@ package org.apache.geode.distributed.internal.membership.adapter;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -57,6 +58,7 @@ public class SocketCreatorAdapter implements TcpSocketCreator {
     return socketCreator.createServerSocket(nport, backlog, bindAddr);
   }
 
+  @Deprecated
   @Override
   public Socket connect(final InetAddress inetadd, final int port, final int timeout,
       final ConnectionWatcher optionalWatcher, final boolean clientSide)
@@ -65,7 +67,15 @@ public class SocketCreatorAdapter implements TcpSocketCreator {
   }
 
   @Override
+  public Socket connect(InetSocketAddress inetSocketAddress, int timeout,
+      final ConnectionWatcher optionalWatcher, final boolean clientSide)
+      throws IOException {
+    return socketCreator.connect(inetSocketAddress, timeout, optionalWatcher, clientSide);
+  }
+
+  @Override
   public void handshakeIfSocketIsSSL(final Socket socket, final int timeout) throws IOException {
     socketCreator.handshakeIfSocketIsSSL(socket, timeout);
   }
+
 }

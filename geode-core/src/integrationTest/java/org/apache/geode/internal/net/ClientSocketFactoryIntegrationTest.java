@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 import java.util.Properties;
 
@@ -94,6 +96,13 @@ public class ClientSocketFactoryIntegrationTest {
 
     @Override
     public Socket createSocket(final InetAddress address, final int port) throws IOException {
+      invokedCreateSocket = true;
+      throw new IOException(EXCEPTION_MESSAGE);
+    }
+
+    @Override
+    public Socket createSocket(Proxy proxy, InetSocketAddress inetSocketAddress)
+        throws IOException {
       invokedCreateSocket = true;
       throw new IOException(EXCEPTION_MESSAGE);
     }

@@ -16,6 +16,8 @@ package org.apache.geode.internal.cache.wan;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 import java.util.List;
 
@@ -37,4 +39,8 @@ public class TransportFilterSocketFactory implements ClientSocketFactory {
     return new TransportFilterSocket(gatewayTransportFilters, address, port);
   }
 
+  @Override
+  public Socket createSocket(Proxy proxy, InetSocketAddress socketAddress) throws IOException {
+    return new TransportFilterSocket(gatewayTransportFilters, proxy, socketAddress);
+  }
 }

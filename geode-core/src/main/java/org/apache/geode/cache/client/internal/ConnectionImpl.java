@@ -17,6 +17,7 @@ package org.apache.geode.cache.client.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -87,8 +88,9 @@ public class ConnectionImpl implements Connection {
       ClientSideHandshake handshake, int socketBufferSize, int handshakeTimeout, int readTimeout,
       CommunicationMode communicationMode, GatewaySender sender, SocketCreator sc)
       throws IOException {
-    theSocket = sc.connectForClient(location.getHostName(), location.getPort(), handshakeTimeout,
-        socketBufferSize);
+    theSocket = sc.connectForClient(
+        InetSocketAddress.createUnresolved(location.getHostName(), location.getPort()),
+        handshakeTimeout, socketBufferSize);
     theSocket.setTcpNoDelay(true);
     theSocket.setSendBufferSize(socketBufferSize);
 

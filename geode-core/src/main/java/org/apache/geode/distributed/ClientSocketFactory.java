@@ -14,8 +14,12 @@
  */
 package org.apache.geode.distributed;
 
+import static java.net.Proxy.NO_PROXY;
+
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.Socket;
 
 /**
@@ -36,6 +40,29 @@ public interface ClientSocketFactory {
    * @param port The port of the server
    *
    * @return a <code>Socket</code> for the input address and port
+   * @deprecated Use {@link #createSocket(InetSocketAddress)}
    */
+  @Deprecated
   Socket createSocket(InetAddress address, int port) throws IOException;
+
+  /**
+   * Creates a <code>Socket</code> for the input inetSocketAddress.
+   *
+   * @param inetSocketAddress address and socket pair to connect to
+   *
+   * @return a <code>Socket</code> for the input inetSocketAddress
+   */
+  default Socket createSocket(InetSocketAddress inetSocketAddress) throws IOException {
+    return createSocket(NO_PROXY, inetSocketAddress);
+  }
+
+  /**
+   * Creates a <code>Socket</code> for the input inetSocketAddress via the given proxy.
+   *
+   * @param proxy to proxy socket over
+   * @param inetSocketAddress address and socket pair to connect to
+   *
+   * @return a <code>Socket</code> for the input inetSocketAddress via the given proxy
+   */
+  Socket createSocket(Proxy proxy, InetSocketAddress inetSocketAddress) throws IOException;
 }

@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 
 import org.junit.Test;
@@ -57,8 +58,8 @@ public class CacheClientUpdaterJUnitTest {
 
     // engineer a failure to connect via SocketCreator
     SocketCreator socketCreator = mock(SocketCreator.class);
-    when(socketCreator.connectForClient(any(String.class), any(Integer.class),
-        any(Integer.class), any(Integer.class))).thenThrow(new SocketException("ouch"));
+    when(socketCreator.connectForClient(any(InetSocketAddress.class), any(Integer.class),
+        any(Integer.class))).thenThrow(new SocketException("ouch"));
 
     // mock some stats that we can then use to ensure that they're closed when the problem occurs
     CacheClientUpdater.StatisticsProvider statisticsProvider = mock(

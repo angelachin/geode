@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -572,7 +573,8 @@ public class GMSHealthMonitor implements HealthMonitor {
             suspectMember.getInetAddress(), port);
         clientSocket =
             SocketCreatorFactory.getSocketCreatorForComponent(SecurableCommunicationChannel.CLUSTER)
-                .connect(suspectMember.getInetAddress(), port, (int) memberTimeout,
+                .connect(new InetSocketAddress(suspectMember.getInetAddress(), port),
+                    (int) memberTimeout,
                     new ConnectTimeoutTask(services.getTimer(), memberTimeout), false, -1, false);
         clientSocket.setTcpNoDelay(true);
         passed = doTCPCheckMember(suspectMember, clientSocket);

@@ -178,7 +178,8 @@ public class SSLSocketIntegrationTest {
     this.serverThread = startServer(this.serverSocket, 15000);
 
     int serverPort = this.serverSocket.getLocalPort();
-    this.clientSocket = this.socketCreator.connectForServer(this.localHost, serverPort);
+    this.clientSocket = this.socketCreator
+        .connectForClient(new InetSocketAddress(this.localHost, serverPort), 0, -1);
 
     // transmit expected string from Client to Server
     ObjectOutputStream output = new ObjectOutputStream(this.clientSocket.getOutputStream());

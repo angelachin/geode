@@ -33,10 +33,6 @@ public interface TcpSocketCreator {
   ServerSocket createServerSocket(int nport, int backlog, InetAddress bindAddr)
       throws IOException;
 
-  @Deprecated
-  Socket connect(InetAddress inetadd, int port, int timeout,
-      ConnectionWatcher optionalWatcher, boolean clientSide) throws IOException;
-
   Socket connect(InetSocketAddress ipAddr, int timeout, ConnectionWatcher optionalWatcher,
       boolean clientSide) throws IOException;
 

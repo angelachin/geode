@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
@@ -315,7 +316,8 @@ public class CacheClientUpdater extends LoggingThread implements ClientUpdater, 
       int socketBufferSize =
           Integer.getInteger("BridgeServer.SOCKET_BUFFER_SIZE", DEFAULT_SOCKET_BUFFER_SIZE);
 
-      mySock = socketCreator.connectForClient(location.getHostName(), location.getPort(),
+      mySock = socketCreator.connectForClient(
+          InetSocketAddress.createUnresolved(location.getHostName(), location.getPort()),
           handshakeTimeout, socketBufferSize);
       mySock.setTcpNoDelay(true);
       mySock.setSendBufferSize(socketBufferSize);

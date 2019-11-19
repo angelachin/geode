@@ -58,14 +58,6 @@ public class SocketCreatorAdapter implements TcpSocketCreator {
     return socketCreator.createServerSocket(nport, backlog, bindAddr);
   }
 
-  @Deprecated
-  @Override
-  public Socket connect(final InetAddress inetadd, final int port, final int timeout,
-      final ConnectionWatcher optionalWatcher, final boolean clientSide)
-      throws IOException {
-    return socketCreator.connect(inetadd, port, timeout, optionalWatcher, clientSide);
-  }
-
   @Override
   public Socket connect(InetSocketAddress inetSocketAddress, int timeout,
       final ConnectionWatcher optionalWatcher, final boolean clientSide)

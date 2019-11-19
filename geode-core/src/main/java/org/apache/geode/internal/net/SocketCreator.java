@@ -15,7 +15,6 @@
 package org.apache.geode.internal.net;
 
 
-import static java.net.Proxy.Type.SOCKS;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -802,13 +801,7 @@ public class SocketCreator {
    * Return a client socket. This method is used by client/server clients.
    */
   public Socket connectForClient(String host, int port, int timeout) throws IOException {
-    return connect(InetAddress.getByName(host), port, timeout, null, true, -1);
-  }
-
-  @Deprecated
-  public Socket connectForClient(String host, int port, int timeout, int socketBufferSize)
-      throws IOException {
-    return connect(InetAddress.getByName(host), port, timeout, null, true, socketBufferSize);
+    return connect(InetSocketAddress.createUnresolved(host, port), timeout, null, true, -1);
   }
 
   /**
@@ -817,20 +810,6 @@ public class SocketCreator {
   public Socket connectForClient(InetSocketAddress inetSocketAddress, int timeout,
       int socketBufferSize) throws IOException {
     return connect(inetSocketAddress, timeout, null, true, socketBufferSize);
-  }
-
-
-  /**
-   * Return a client socket. This method is used by peers.
-   */
-  public Socket connectForServer(InetAddress inetadd, int port) throws IOException {
-    return connect(inetadd, port, 0, null, false, -1);
-  }
-
-  @Deprecated
-  public Socket connect(InetAddress inetadd, int port, int timeout,
-      ConnectionWatcher optionalWatcher, boolean clientSide) throws IOException {
-    return connect(inetadd, port, timeout, optionalWatcher, clientSide, -1);
   }
 
   /**
@@ -842,14 +821,6 @@ public class SocketCreator {
       ConnectionWatcher optionalWatcher, boolean clientSide)
       throws IOException {
     return connect(inetSocketAddress, timeout, optionalWatcher, clientSide, -1);
-  }
-
-  @Deprecated
-  public Socket connect(InetAddress inetadd, int port, int timeout,
-      ConnectionWatcher optionalWatcher, boolean clientSide, int socketBufferSize)
-      throws IOException {
-    return connect(inetadd, port, timeout, optionalWatcher, clientSide, socketBufferSize,
-        sslConfig.isEnabled());
   }
 
   /**
@@ -864,14 +835,6 @@ public class SocketCreator {
         sslConfig.isEnabled());
   }
 
-  @Deprecated
-  public Socket connect(InetAddress inetadd, int port, int timeout,
-      ConnectionWatcher optionalWatcher, boolean clientSide, int socketBufferSize,
-      boolean sslConnection) throws IOException {
-    return connect(new InetSocketAddress(inetadd, port), timeout, optionalWatcher, clientSide,
-        socketBufferSize, sslConnection);
-  }
-
   /**
    * Return a client socket, timing out if unable to connect and timeout > 0 (millis). The parameter
    * <i>timeout</i> is ignored if SSL is being used, as there is no timeout argument in the ssl
@@ -881,8 +844,8 @@ public class SocketCreator {
       ConnectionWatcher optionalWatcher, boolean clientSide, int socketBufferSize,
       boolean sslConnection) throws IOException {
     Socket socket = null;
-    final Proxy proxy =
-        new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 10800));
+    final Proxy proxy = Proxy.NO_PROXY;
+    // new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 10800));
     printConfig();
     try {
       if (sslConnection) {

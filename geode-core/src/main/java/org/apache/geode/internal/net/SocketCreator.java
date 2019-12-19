@@ -16,6 +16,8 @@ package org.apache.geode.internal.net;
 
 
 
+import static org.apache.geode.internal.lang.SystemPropertyHelper.GEODE_PREFIX;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.BindException;
@@ -185,6 +187,8 @@ public class SocketCreator {
 
   private final SSLConfig sslConfig;
 
+  private final Proxy proxy;
+
   static {
     InetAddress inetAddress = null;
     try {
@@ -271,6 +275,8 @@ public class SocketCreator {
   public SocketCreator(final SSLConfig sslConfig) {
     this.sslConfig = sslConfig;
     initialize();
+
+    proxy = ProxyFactory.create(System.getProperty(GEODE_PREFIX + "proxy"));
   }
 
 
@@ -844,8 +850,6 @@ public class SocketCreator {
       ConnectionWatcher optionalWatcher, boolean clientSide, int socketBufferSize,
       boolean sslConnection) throws IOException {
     Socket socket = null;
-    final Proxy proxy = Proxy.NO_PROXY;
-    // new Proxy(SOCKS, InetSocketAddress.createUnresolved("104.198.221.247", 10800));
     printConfig();
     try {
       if (sslConnection) {

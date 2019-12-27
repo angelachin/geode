@@ -4,16 +4,15 @@ import static java.net.Proxy.Type.SOCKS;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.junit.Test;
 
-import org.apache.geode.cache.Region;
-import org.apache.geode.cache.client.ClientCache;
-import org.apache.geode.cache.client.ClientCacheFactory;
-import org.apache.geode.cache.client.ClientRegionShortcut;
+import org.apache.geode.internal.net.proxy.SniProxySocket;
 
 public class SocketCreatorWithProxyTest {
   @Test
@@ -24,19 +23,15 @@ public class SocketCreatorWithProxyTest {
     Socket socket = new Socket(proxy);
     socket.connect(InetSocketAddress.createUnresolved("cluster-sample-locator", 10334));
     assertThat(socket.isConnected()).isTrue();
+    assertThat(socket.getRemoteSocketAddress())
+        .isEqualTo(new InetSocketAddress((InetAddress) null, 10334));
     socket.close();
     assertThat(socket.isClosed()).isTrue();
   }
 
   @Test
-  public void connectToLocatorWithProxy() {
-    final ClientCache client = new ClientCacheFactory()
-        .addPoolLocator("cluster-sample-locator", 10334)
-        .create();
-
-    final Region region = client.createClientRegionFactory(ClientRegionShortcut.PROXY)
-        .create("K8sBenchmark");
-
-    assertThat(region.sizeOnServer()).isEqualTo(1000000);
+  public void connectToLocatorWithProxy() throws SocketException {
+    SniProxySocket sniProxySocket = new SniProxySocket(new InetSocketAddress("localhost", 1234));
   }
+
 }

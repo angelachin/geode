@@ -557,6 +557,32 @@ public class BucketRegion extends DistributedRegion implements Bucket {
     }
   }
 
+  @Override
+  void cmnClearRegion(RegionEventImpl regionEvent, boolean cacheWrite, boolean useRVV) {
+    if (!getBucketAdvisor().isPrimary()) {
+      logger.info("Not primary bucket when doing clear, do nothing");
+      return;
+    }
+
+    boolean enableRVV = useRVV && getConcurrencyChecksEnabled();
+    RegionVersionVector rvv = null;
+    if (enableRVV) {
+      rvv = getVersionVector();
+    }
+
+    // get rvvLock
+    Set<InternalDistributedMember> participants =
+        getCacheDistributionAdvisor().adviseInvalidateRegion();
+    try {
+      obtainWriteLocksForClear(regionEvent, participants);
+      clearRegionLocally(regionEvent, cacheWrite, rvv);
+      distributeClearOperation(regionEvent, rvv, participants);
+
+      // TODO: call reindexUserDataRegion if there're lucene indexes
+    } finally {
+      releaseWriteLocksForClear(regionEvent, participants);
+    }
+  }
 
   long generateTailKey() {
     long key = eventSeqNum.addAndGet(partitionedRegion.getTotalNumberOfBuckets());
@@ -2087,18 +2113,9 @@ public class BucketRegion extends DistributedRegion implements Bucket {
     if (isDestroyed || isDestroyingDiskRegion) {
       // If this region is destroyed, mark the stat as destroyed.
       oldMemValue = bytesInMemory.getAndSet(BUCKET_DESTROYED);
-
-    } else if (!isInitialized()) {
-      // This case is rather special. We clear the region if the GII failed.
-      // In the case of bucket regions, we know that there will be no concurrent operations
-      // if GII has failed, because there is not primary. So it's safe to set these
-      // counters to 0.
+    } else {
+      // BucketRegion's clear is supported now
       oldMemValue = bytesInMemory.getAndSet(0);
-    }
-
-    else {
-      throw new InternalGemFireError(
-          "Trying to clear a bucket region that was not destroyed or in initialization.");
     }
     if (oldMemValue != BUCKET_DESTROYED) {
       partitionedRegion.getPrStats().incDataStoreEntryCount(-sizeBeforeClear);

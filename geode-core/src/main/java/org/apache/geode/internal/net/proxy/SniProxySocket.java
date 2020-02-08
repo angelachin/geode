@@ -1,7 +1,6 @@
 package org.apache.geode.internal.net.proxy;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
@@ -26,6 +25,6 @@ public class SniProxySocket extends Socket {
 
   @Override
   public SocketAddress getRemoteSocketAddress() {
-    return new InetSocketAddress((InetAddress) null, endpoint.getPort());
+    return new InetSocketAddress(endpoint.getHostName(), endpoint.getPort());
   }
 }

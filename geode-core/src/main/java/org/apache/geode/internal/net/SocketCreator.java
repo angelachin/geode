@@ -15,7 +15,73 @@
 package org.apache.geode.internal.net;
 
 
+import static org.apache.geode.internal.lang.SystemPropertyHelper.GEODE_PREFIX;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.BindException;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.Proxy;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.security.GeneralSecurityException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.net.ServerSocketFactory;
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SNIHostName;
+import javax.net.ssl.SNIServerName;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLProtocolException;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509ExtendedKeyManager;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.geode.GemFireConfigException;
 import org.apache.geode.SystemConnectException;
 import org.apache.geode.SystemFailure;
@@ -38,30 +104,6 @@ import org.apache.geode.internal.util.ArgumentRedactor;
 import org.apache.geode.internal.util.PasswordUtil;
 import org.apache.geode.logging.internal.log4j.api.LogService;
 import org.apache.geode.management.internal.SSLUtil;
-import org.apache.logging.log4j.Logger;
-
-import javax.naming.Context;
-import javax.naming.NamingEnumeration;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
-import javax.net.ServerSocketFactory;
-import javax.net.ssl.*;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.security.*;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
-
-import static org.apache.geode.internal.lang.SystemPropertyHelper.GEODE_PREFIX;
 
 /**
  * Analyze configuration data (gemfire.properties) and configure sockets accordingly for SSL.
@@ -1032,7 +1074,8 @@ public class SocketCreator {
    * When a socket is accepted from a server socket, it should be passed to this method for SSL
    * configuration.
    */
-  private void configureClientSSLSocket(InetSocketAddress inetSocketAddress, Socket socket, int timeout) throws IOException {
+  private void configureClientSSLSocket(InetSocketAddress inetSocketAddress, Socket socket,
+      int timeout) throws IOException {
     if (socket instanceof SSLSocket) {
       SSLSocket sslSocket = (SSLSocket) socket;
 
@@ -1224,41 +1267,41 @@ public class SocketCreator {
    */
   public static boolean isLocalHost(Object host) {
     return false;
-//    if (host instanceof InetAddress) {
-//      InetAddress inetAddress = (InetAddress) host;
-//      if (isLocalHost(inetAddress)) {
-//        return true;
-//      } else if (inetAddress.isLoopbackAddress()) {
-//        return true;
-//      } else {
-//        try {
-//          Enumeration en = NetworkInterface.getNetworkInterfaces();
-//          while (en.hasMoreElements()) {
-//            NetworkInterface i = (NetworkInterface) en.nextElement();
-//            for (Enumeration en2 = i.getInetAddresses(); en2.hasMoreElements();) {
-//              InetAddress addr = (InetAddress) en2.nextElement();
-//              if (inetAddress.equals(addr)) {
-//                return true;
-//              }
-//            }
-//          }
-//          return false;
-//        } catch (SocketException e) {
-//          throw new IllegalArgumentException("Unable to query network interface", e);
-//        }
-//      }
-//    } else {
-//      return isLocalHost((Object) toInetAddress(host.toString()));
-//    }
+    // if (host instanceof InetAddress) {
+    // InetAddress inetAddress = (InetAddress) host;
+    // if (isLocalHost(inetAddress)) {
+    // return true;
+    // } else if (inetAddress.isLoopbackAddress()) {
+    // return true;
+    // } else {
+    // try {
+    // Enumeration en = NetworkInterface.getNetworkInterfaces();
+    // while (en.hasMoreElements()) {
+    // NetworkInterface i = (NetworkInterface) en.nextElement();
+    // for (Enumeration en2 = i.getInetAddresses(); en2.hasMoreElements();) {
+    // InetAddress addr = (InetAddress) en2.nextElement();
+    // if (inetAddress.equals(addr)) {
+    // return true;
+    // }
+    // }
+    // }
+    // return false;
+    // } catch (SocketException e) {
+    // throw new IllegalArgumentException("Unable to query network interface", e);
+    // }
+    // }
+    // } else {
+    // return isLocalHost((Object) toInetAddress(host.toString()));
+    // }
   }
 
   private static boolean isLocalHost(InetAddress host) {
     return false;
-//    try {
-//      return SocketCreator.getLocalHost().equals(host);
-//    } catch (UnknownHostException ignored) {
-//      return false;
-//    }
+    // try {
+    // return SocketCreator.getLocalHost().equals(host);
+    // } catch (UnknownHostException ignored) {
+    // return false;
+    // }
   }
 
   /**

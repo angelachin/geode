@@ -50,7 +50,7 @@ public class SocketCreatorWithProxyTest {
     gemFireProps.setProperty(SSL_TRUSTSTORE_PASSWORD, "PDEf7uyKmlFcYIaO77qUWm7oloc2Oy");
 
     ClientCache cache = new ClientCacheFactory(gemFireProps)
-        .addPoolLocator("dceebbfa-174b-4f71-834d-11abb9ff3063.locator.lima-services-subnet.service-instance-7b9600e8-5872-4659-8a99-9ec6c2ec8cad.bosh", 55221)
+        .addPoolLocator("ffe8fc05-152d-4a4b-852b-1fd820bb68a9.locator.lima-services-subnet.service-instance-60bce0c4-e27d-445b-bcc2-226b0783e2d1.bosh", 55221)
         .create();
     Region<String, String> region = cache.<String, String>
         createClientRegionFactory(ClientRegionShortcut.CACHING_PROXY)
